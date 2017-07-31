@@ -196,8 +196,10 @@ void periph_module_disable(periph_module_t periph)
             DPORT_SET_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST_1);
             break;
         case PERIPH_HSPI_MODULE:
-            DPORT_CLEAR_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN);
-            DPORT_SET_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST);
+            // currently disabled to work around issue.
+            // see https://github.com/SHA2017-badge/Firmware/issues/70
+//            DPORT_CLEAR_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN);
+//            DPORT_SET_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST);
             break;
         case PERIPH_VSPI_MODULE:
             DPORT_CLEAR_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN_2);
