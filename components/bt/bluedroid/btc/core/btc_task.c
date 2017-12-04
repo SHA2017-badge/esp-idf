@@ -17,8 +17,8 @@
 #include "btc_task.h"
 #include "bt_trace.h"
 #include "thread.h"
-#include "gki.h"
 #include "bt_defs.h"
+#include "allocator.h"
 #include "btc_main.h"
 #include "btc_dev.h"
 #include "btc_gatts.h"
@@ -88,7 +88,7 @@ static void btc_task(void *arg)
                 break;
             }
             if (msg.arg) {
-                GKI_freebuf(msg.arg);
+                osi_free(msg.arg);
             }
         }
     }
@@ -120,7 +120,7 @@ bt_status_t btc_transfer_context(btc_msg_t *msg, void *arg, int arg_len, btc_arg
 
     memcpy(&lmsg, msg, sizeof(btc_msg_t));
     if (arg) {
-        lmsg.arg = (void *)GKI_getbuf(arg_len);
+        lmsg.arg = (void *)osi_malloc(arg_len);
         if (lmsg.arg == NULL) {
             return BT_STATUS_NOMEM;
         }
@@ -139,9 +139,9 @@ bt_status_t btc_transfer_context(btc_msg_t *msg, void *arg, int arg_len, btc_arg
 
 int btc_init(void)
 {
-    xBtcQueue = xQueueCreate(BTC_TASK_QUEUE_NUM, sizeof(btc_msg_t));
-    xTaskCreatePinnedToCore(btc_task, "Btc_task", BTC_TASK_STACK_SIZE, NULL, BTC_TASK_PRIO, &xBtcTaskHandle, 0);
-
+    xBtcQueue = xQueueCreate(BTC_TASK_QUEUE_LEN, sizeof(btc_msg_t));
+    xTaskCreatePinnedToCore(btc_task, "Btc_task", BTC_TASK_STACK_SIZE, NULL, BTC_TASK_PRIO, &xBtcTaskHandle, BTC_TASK_PINNED_TO_CORE);
+    btc_gap_callback_init();
     /* TODO: initial the profile_tab */
 
     return BT_STATUS_SUCCESS;

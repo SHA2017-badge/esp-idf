@@ -34,7 +34,6 @@
 #include "bta_api.h"
 #include "btc_media.h"
 #include "bta_av_api.h"
-#include "gki.h"
 #include "btu.h"
 #include "bt_utils.h"
 #include "btc_common.h"
@@ -1121,7 +1120,7 @@ bt_status_t btc_av_execute_service(BOOLEAN b_enable)
          * auto-suspend av streaming on AG events(SCO or Call). The suspend shall
          * be initiated by the app/audioflinger layers */
         BTA_AvEnable(BTA_SEC_AUTHENTICATE, (BTA_AV_FEAT_NO_SCO_SSPD)
-                     // | BTA_AV_FEAT_RCTG | BTA_AV_FEAT_METADATA | BTA_AV_FEAT_VENDOR
+                     | BTA_AV_FEAT_RCTG | BTA_AV_FEAT_METADATA | BTA_AV_FEAT_VENDOR
                      | BTA_AV_FEAT_RCCT | BTA_AV_FEAT_ADV_CTRL,
                      bte_av_callback);
         BTA_AvRegister(BTA_AV_CHNL_AUDIO, BTC_AV_SERVICE_NAME, 0, bte_av_media_callback, &bta_av_a2d_cos);

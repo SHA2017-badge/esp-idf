@@ -405,6 +405,7 @@ tcp_abandon(struct tcp_pcb *pcb, int reset)
 #if TCP_QUEUE_OOSEQ
     if (pcb->ooseq != NULL) {
       tcp_segs_free(pcb->ooseq);
+      pcb->ooseq = NULL;
     }
 #endif /* TCP_QUEUE_OOSEQ */
     if (send_rst) {
@@ -696,14 +697,12 @@ tcp_new_port(void)
 again:
 
 #if ESP_RANDOM_TCP_PORT
-	tcp_port = system_get_time();
-	if (tcp_port < 0)
-		tcp_port = LWIP_RAND() - tcp_port;
-	tcp_port %= TCP_LOCAL_PORT_RANGE_START;
+  tcp_port = abs(LWIP_RAND()) % (TCP_LOCAL_PORT_RANGE_END - TCP_LOCAL_PORT_RANGE_START);
+  tcp_port += TCP_LOCAL_PORT_RANGE_START;
 #else
-      if (tcp_port++ == TCP_LOCAL_PORT_RANGE_END) {
-            tcp_port = TCP_LOCAL_PORT_RANGE_START;
-      }
+  if (tcp_port++ == TCP_LOCAL_PORT_RANGE_END) {
+    tcp_port = TCP_LOCAL_PORT_RANGE_START;
+  }
 #endif
 
   /* Check all PCB lists. */
@@ -1250,9 +1249,7 @@ tcp_seg_free(struct tcp_seg *seg)
   if (seg != NULL) {
     if (seg->p != NULL) {
       pbuf_free(seg->p);
-#if TCP_DEBUG
       seg->p = NULL;
-#endif /* TCP_DEBUG */
     }
     memp_free(MEMP_TCP_SEG, seg);
   }
@@ -1354,8 +1351,6 @@ tcp_kill_state(enum tcp_state state)
 {
   struct tcp_pcb *pcb, *inactive;
   u32_t inactivity;
-
-  LWIP_ASSERT("invalid state", (state == CLOSING) || (state == LAST_ACK));
 
   inactivity = 0;
   inactive = NULL;

@@ -39,7 +39,7 @@ struct test_desc_t
 
 void unity_testcase_register(struct test_desc_t* desc);
 
-void unity_run_menu();
+void unity_run_menu() __attribute__((noreturn));
 
 void unity_run_tests_with_filter(const char* filter);
 
@@ -81,8 +81,8 @@ void unity_run_all_tests();
  */
 
 // shorthand to check esp_err_t return code
-#define TEST_ESP_OK(rc)	TEST_ASSERT_EQUAL_INT32(ESP_OK, rc)
-#define TEST_ESP_ERR(err, rc) TEST_ASSERT_EQUAL_INT32(err, rc)
+#define TEST_ESP_OK(rc)	TEST_ASSERT_EQUAL_HEX32(ESP_OK, rc)
+#define TEST_ESP_ERR(err, rc) TEST_ASSERT_EQUAL_HEX32(err, rc)
 
 
 #endif //UNITY_CONFIG_H
